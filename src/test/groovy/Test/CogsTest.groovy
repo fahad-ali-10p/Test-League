@@ -2,8 +2,16 @@ package Test
 
 import POM.Dashboard
 import POM.LoginForm
+import POM.Reports
+import POM.SideNavigation
+import org.junit.Assert
+import org.openqa.selenium.By
+import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.chrome.ChromeDriver
 import spock.lang.Specification
+
+import java.util.concurrent.TimeUnit
+
 /**
  * Created by fahad.ali on 24/10/2018.
  */
@@ -15,6 +23,8 @@ class CogsTest extends Specification {
     static Properties prop = null
     static LoginForm LoginPage
     static Dashboard Dashboardpage
+    static SideNavigation Sidenavigationbar
+    static Reports Reportsmanagement
     //static LoginForm GoToURL
 
     static  {
@@ -31,9 +41,10 @@ class CogsTest extends Specification {
 
         LoginPage = new LoginForm(driver,prop)
         Dashboardpage = new Dashboard(driver,prop)
+        Sidenavigationbar = new SideNavigation(driver,prop)
+        Reportsmanagement = new Reports(driver,prop)
 
-
-
+        JavascriptExecutor jse = (JavascriptExecutor)driver;
 
 }
 
@@ -46,19 +57,74 @@ class CogsTest extends Specification {
 
 
         then:
-        true
+
+        LoginPage.loginAssertion()
 
     }
 
 
-    def "Open header navigation"(){
+    def "Open profile from the header navigation"(){
 
         when:
-        Thread.sleep(9000)
+        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS)
         Dashboardpage.openProfile()
+
+        then:
+        Dashboardpage.DashboardAssertion()
+
+    }
+
+
+    def "Open reports from the side navigation"(){
+
+        when:
+        Sidenavigationbar.openReports()
+        then:
+        Dashboardpage.DashboardAssertion()
+
+    }
+
+    def "ReportManagement- Leave Report"(){
+
+        when:
+        Reportsmanagement.openLeavesReports()
+        Reportsmanagement.SearchEmployeeName('tbuhfdacgreyijk jibdyceaghrtfuk')
+
+        then:
+        Dashboardpage.DashboardAssertion()
+    }
+
+
+    def "ReportManagement- Project Pulse report"(){
+
+        when:
+        Sidenavigationbar.openReports()
+        Reportsmanagement.openProjectpulseReports()
+        Reportsmanagement.openDropdownReport()
+
+        then:
+        Dashboardpage.DashboardAssertion()
+    }
+
+    def "ReportManagement- Download Pulse report"(){
+
+        when:
+        TimeUnit.SECONDS.sleep(1)
+        Reportsmanagement.downloadreport()
+
+        then:
+        true
+    }
+
+    def "Project Costing report"(){
+
+        when:
+
+        Sidenavigationbar.openReports()
+        Reportsmanagement.projectCostingreport()
+
         then:
         true
 
     }
-
 }
